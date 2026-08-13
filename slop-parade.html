@@ -1,7 +1,7 @@
-<!DOCTYPE html>
-<!-- saved from url=(0125)file:///Users/schulz/Documents/Codex/2026-08-13/referenced-chatgpt-conversation-this-is-an-2/outputs/codex-approval-rush.html -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SLOP PARADE</title>
   <style>
@@ -376,7 +376,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 8px;
     }
 
@@ -549,6 +549,21 @@
       background: #251f32;
     }
 
+    .prompt.nuisance {
+      border-color: rgba(217, 164, 65, .76);
+      background: #2c2618;
+    }
+
+    .prompt.provider {
+      border-color: rgba(74, 163, 255, .78);
+      background: #18283a;
+    }
+
+    .prompt.coffee {
+      border-color: rgba(63, 185, 80, .78);
+      background: #182b22;
+    }
+
     .prompt-titlebar {
       height: 34px;
       display: flex;
@@ -565,6 +580,21 @@
     .prompt.compact .prompt-titlebar {
       background: #342947;
       border-color: #4c3a69;
+    }
+
+    .prompt.nuisance .prompt-titlebar {
+      background: #3a301d;
+      border-color: #594728;
+    }
+
+    .prompt.provider .prompt-titlebar {
+      background: #203852;
+      border-color: #36597c;
+    }
+
+    .prompt.coffee .prompt-titlebar {
+      background: #203b2b;
+      border-color: #315d41;
     }
 
     .prompt-titlebar strong {
@@ -618,6 +648,24 @@
       color: #d5bdff;
       background: rgba(163, 113, 247, .16);
       border-color: rgba(163, 113, 247, .32);
+    }
+
+    .prompt.nuisance .prompt-badge {
+      color: #ffdf8a;
+      background: rgba(217, 164, 65, .16);
+      border-color: rgba(217, 164, 65, .34);
+    }
+
+    .prompt.provider .prompt-badge {
+      color: #9ed0ff;
+      background: rgba(74, 163, 255, .16);
+      border-color: rgba(74, 163, 255, .34);
+    }
+
+    .prompt.coffee .prompt-badge {
+      color: #91f2a6;
+      background: rgba(63, 185, 80, .16);
+      border-color: rgba(63, 185, 80, .34);
     }
 
     .prompt h2 {
@@ -692,6 +740,24 @@
       color: #fff;
       border-color: rgba(163, 113, 247, .74);
       background: #6e40c9;
+    }
+
+    .action.secondary-action {
+      color: #fff6d6;
+      border-color: rgba(217, 164, 65, .74);
+      background: #735321;
+    }
+
+    .action.provider-action {
+      color: #fff;
+      border-color: rgba(74, 163, 255, .74);
+      background: #1f6feb;
+    }
+
+    .action.coffee-action {
+      color: #fff;
+      border-color: rgba(63, 185, 80, .74);
+      background: #238636;
     }
 
     .toast-stack {
@@ -1054,22 +1120,18 @@
                 <span id="progressLabel">Project 1 readiness</span>
                 <strong id="progressText">0%</strong>
               </div>
-              <div class="meter" aria-hidden="true"><div id="progressFill" class="meter-fill" style="width: 0%;"></div></div>
+              <div class="meter" aria-hidden="true"><div id="progressFill" class="meter-fill"></div></div>
             </section>
             <section class="stats">
               <div class="stat"><span>Level</span><strong id="levelStat">1</strong></div>
               <div class="stat"><span>Correct</span><strong id="correctStat">0</strong></div>
               <div class="stat"><span>Risk</span><strong id="riskStat">0</strong></div>
               <div class="stat"><span>Queue</span><strong id="queueStat">0</strong></div>
+              <div class="stat"><span>Tokens</span><strong id="tokenStat">--</strong></div>
             </section>
             <section class="agent-feed">
               <div class="feed-title">Agent Activity</div>
-              <div id="feedList" class="feed-list">
-        <div class="feed-item">
-          <span class="feed-dot"></span>
-          <span>Agents queued for approval</span>
-        </div>
-      </div>
+              <div id="feedList" class="feed-list"></div>
             </section>
           </aside>
         </div>
@@ -1088,7 +1150,8 @@
       </div>
       <div class="status-right">
         <span id="scoreStatus">score 0</span>
-        <span id="remainingStatus">project 1 target 32</span>
+        <span id="providerStatus">provider local</span>
+        <span id="remainingStatus">level 1</span>
       </div>
     </footer>
 
@@ -1099,7 +1162,7 @@
       <div class="dialog">
         <div class="dialog-head">
           <h1>SLOP PARADE</h1>
-          <div class="dialog-badge">2:00 rounds</div>
+          <div class="dialog-badge">2:00 projects</div>
         </div>
         <div class="dialog-body">
           <p>Finish each project before the two-minute deadline. Reaching 100% readiness advances to the next project, where prompt pressure increases.</p>
@@ -1107,6 +1170,7 @@
             <div class="rule"><strong>Accept good prompts</strong><span>Correct approvals build project readiness.</span></div>
             <div class="rule"><strong>Decline bad prompts</strong><span>Approving destructive changes ends the run.</span></div>
             <div class="rule"><strong>Compact context</strong><span>Clears the current queue and pauses new popups for 10 seconds.</span></div>
+            <div class="rule"><strong>Watch the queue</strong><span>More than 10 active approval prompts ends the run.</span></div>
           </div>
           <button id="startButton" class="primary">Start Parade</button>
         </div>
@@ -1171,14 +1235,36 @@
       goodDeclinePenaltyMs: 7000,
       compactDurationMs: 10000,
       baseMaxPrompts: 3,
-      maxPromptCap: 8,
+      maxPromptCap: 10,
+      queueLimit: 10,
       baseFirstSpawnMs: 1100,
       baseMinSpawnMs: 1500,
       baseMaxSpawnMs: 2800,
       minSpawnFloorMs: 520,
       maxSpawnFloorMs: 1050,
       compactEveryMinMs: 15000,
-      compactEveryMaxMs: 24500
+      compactEveryMaxMs: 24500,
+      imageEveryMinMs: 9000,
+      imageEveryMaxMs: 16000,
+      maxImagePopups: 2,
+      tokenLimit: 14000,
+      enterpriseTokenLimit: 999999,
+      tokenPromptCost: 850,
+      tokenImageCost: 2200,
+      tokenSwitchBonus: 900,
+      projectFunds: 650,
+      enterprisePlanCost: 3200
+    };
+
+    const PROVIDERS = ["LocalAI", "CodeWave", "OrbitLLM", "Northstar"];
+
+    const LEVEL_FEATURES = {
+      1: "Only useful approval prompts appear.",
+      2: "Dangerous prompts now enter the queue.",
+      3: "Compact Context can now appear.",
+      4: "Unrequested image generation can interrupt the session.",
+      5: "Token limits can pause approvals until you switch providers.",
+      6: "Coffee break: project funds can buy the enterprise token plan."
     };
 
     const els = {
@@ -1191,10 +1277,12 @@
       correctStat: document.getElementById("correctStat"),
       riskStat: document.getElementById("riskStat"),
       queueStat: document.getElementById("queueStat"),
+      tokenStat: document.getElementById("tokenStat"),
       feedList: document.getElementById("feedList"),
       terminalBody: document.getElementById("terminalBody"),
       compactStatus: document.getElementById("compactStatus"),
       scoreStatus: document.getElementById("scoreStatus"),
+      providerStatus: document.getElementById("providerStatus"),
       remainingStatus: document.getElementById("remainingStatus"),
       toastStack: document.getElementById("toastStack"),
       startOverlay: document.getElementById("startOverlay"),
@@ -1216,13 +1304,22 @@
       compactUntil: 0,
       nextSpawnAt: 0,
       nextCompactAt: 0,
+      nextImageAt: 0,
       active: new Map(),
+      images: new Map(),
       level: 1,
       correct: 0,
       totalCorrect: 0,
       riskStopped: 0,
+      imageDismissed: 0,
       mistakes: 0,
       score: 0,
+      funds: 0,
+      tokenUsage: 0,
+      providerIndex: 0,
+      providerLocked: false,
+      enterprisePlan: false,
+      coffeeBreakOffered: false,
       promptId: 1,
       animationFrame: null,
       lastTerminalAt: 0,
@@ -1253,6 +1350,7 @@
       els.endOverlay.classList.add("hidden");
       addFeed("session", "Project 1 approval sprint started");
       addTerminal("pass", "project 1 warmed with current context");
+      announceLevelFeature();
       updateUi(now);
       state.animationFrame = requestAnimationFrame(tick);
     }
@@ -1261,17 +1359,26 @@
       cancelAnimationFrame(state.animationFrame);
       state.running = false;
       state.active.clear();
+      state.images.clear();
       state.level = 1;
       state.correct = 0;
       state.totalCorrect = 0;
       state.riskStopped = 0;
+      state.imageDismissed = 0;
       state.mistakes = 0;
       state.score = 0;
+      state.funds = 0;
+      state.tokenUsage = 0;
+      state.providerIndex = 0;
+      state.providerLocked = false;
+      state.enterprisePlan = false;
+      state.coffeeBreakOffered = false;
       state.promptId = 1;
       state.feed = [];
       state.terminal = [];
       state.compactUntil = 0;
       state.lastTerminalAt = 0;
+      state.nextImageAt = 0;
       state.displayRemainingMs = CONFIG.durationMs;
       els.desktop.innerHTML = "";
       els.toastStack.innerHTML = "";
@@ -1286,11 +1393,17 @@
       clearPrompts();
       state.correct = 0;
       state.compactUntil = 0;
+      state.providerLocked = false;
+      state.tokenUsage = state.enterprisePlan ? 0 : Math.min(state.tokenUsage, Math.floor(getTokenLimit() * .45));
       state.endAt = now + CONFIG.durationMs;
       state.displayRemainingMs = CONFIG.durationMs;
       const difficulty = getDifficulty();
       state.nextSpawnAt = now + difficulty.firstSpawnMs;
       state.nextCompactAt = now + randomBetween(CONFIG.compactEveryMinMs, CONFIG.compactEveryMaxMs);
+      state.nextImageAt = now + randomBetween(CONFIG.imageEveryMinMs, CONFIG.imageEveryMaxMs);
+      if (state.level >= 6 && !state.enterprisePlan) {
+        window.setTimeout(() => spawnCoffeeBreak(), 550);
+      }
     }
 
     function tick(now) {
@@ -1307,13 +1420,28 @@
         return;
       }
 
-      if (now >= state.nextCompactAt && !document.querySelector(".prompt.compact")) {
+      if (state.level >= 5 && !state.enterprisePlan && state.tokenUsage >= getTokenLimit() && !state.providerLocked) {
+        state.providerLocked = true;
+        spawnProviderPrompt();
+      }
+
+      if (state.active.size > CONFIG.queueLimit) {
+        finishGame(false, "Queue overflow", "More than 10 approval prompts were open at once.");
+        return;
+      }
+
+      if (state.level >= 3 && now >= state.nextCompactAt && !document.querySelector(".prompt.compact")) {
         spawnCompactPrompt(now);
         state.nextCompactAt = now + randomBetween(CONFIG.compactEveryMinMs, CONFIG.compactEveryMaxMs);
       }
 
+      if (state.level >= 4 && now >= state.nextImageAt && state.images.size < CONFIG.maxImagePopups) {
+        spawnImagePopup();
+        state.nextImageAt = now + randomBetween(CONFIG.imageEveryMinMs, CONFIG.imageEveryMaxMs);
+      }
+
       const difficulty = getDifficulty();
-      if (now >= state.nextSpawnAt && now >= state.compactUntil && state.active.size < difficulty.maxPrompts) {
+      if (!state.providerLocked && now >= state.nextSpawnAt && now >= state.compactUntil && state.active.size <= difficulty.maxPrompts) {
         spawnApprovalPrompt();
         state.nextSpawnAt = now + randomBetween(difficulty.minSpawnMs, difficulty.maxSpawnMs);
       }
@@ -1332,11 +1460,13 @@
       const completedLevel = state.level;
       const timeBonus = Math.ceil(Math.max(0, state.endAt - now) / 1000) * 8;
       state.score += 500 + timeBonus;
+      state.funds += CONFIG.projectFunds + completedLevel * 120;
       state.level += 1;
       addTerminal("pass", `project ${completedLevel} shipped; advancing to project ${state.level}`);
       addFeed("level", `Project ${completedLevel} complete`);
       showToast("good", `Project ${completedLevel} complete. Level ${state.level} begins.`);
       startProject(now);
+      announceLevelFeature();
       updateUi(now);
     }
 
@@ -1347,11 +1477,15 @@
       state.active.set(String(id), { id, prompt, node });
       els.desktop.appendChild(node);
       placePrompt(node);
+      addTokens(CONFIG.tokenPromptCost);
       addFeed(prompt.kind === "bad" ? "risk" : "approval", prompt.title);
       updateUi(performance.now());
     }
 
     function choosePrompt() {
+      if (state.level < 2) {
+        return pick(PROMPT_LIBRARY.filter(item => item.kind === "good"));
+      }
       const badChance = Math.min(.34, (state.correct < 6 ? .12 : .22) + (state.level - 1) * .025);
       const kind = Math.random() < badChance ? "bad" : "good";
       const pool = PROMPT_LIBRARY.filter(item => item.kind === kind);
@@ -1416,6 +1550,141 @@
       placePrompt(node);
       addFeed("context", "Compact context available");
       showToast("compact", "Compact context is ready.");
+    }
+
+    function spawnImagePopup() {
+      const id = "image-" + state.promptId++;
+      const node = document.createElement("article");
+      node.className = "prompt nuisance";
+      node.dataset.id = id;
+      node.innerHTML = `
+        <div class="prompt-titlebar">
+          <strong>AI image generation</strong>
+          <span class="prompt-pill">noise</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-main">
+            <div class="prompt-badge">${imageIcon()}</div>
+            <div>
+              <h2>Unrequested Concept Art</h2>
+              <p>An agent started rendering a cinematic splash image instead of finishing the project.</p>
+            </div>
+          </div>
+          <div class="prompt-file">outputs/generated-hero-v27-final-final.png</div>
+          <div class="actions">
+            <button class="action secondary-action">${xIcon()} Dismiss</button>
+          </div>
+        </div>
+      `;
+      node.querySelector("button").addEventListener("click", () => dismissImagePopup(id));
+      state.images.set(id, node);
+      els.desktop.appendChild(node);
+      placePrompt(node);
+      addTokens(CONFIG.tokenImageCost);
+      addFeed("image", "Unrequested image generation");
+      showToast("bad", "Image generation popup opened.");
+    }
+
+    function dismissImagePopup(id) {
+      const node = state.images.get(id);
+      if (!node) return;
+      state.images.delete(id);
+      node.remove();
+      state.imageDismissed += 1;
+      state.score += 35;
+      addTerminal("warn", "closed unrequested image generation");
+      updateUi(performance.now());
+    }
+
+    function spawnProviderPrompt() {
+      if (document.querySelector(".prompt.provider")) return;
+      const node = document.createElement("article");
+      node.className = "prompt provider";
+      node.innerHTML = `
+        <div class="prompt-titlebar">
+          <strong>Token limit exceeded</strong>
+          <span class="prompt-pill">provider</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-main">
+            <div class="prompt-badge">${providerIcon()}</div>
+            <div>
+              <h2>Switch AI Provider</h2>
+              <p>The current provider is out of usable tokens. Approval work is paused until the provider is changed.</p>
+            </div>
+          </div>
+          <div class="prompt-file">${escapeHtml(getProviderName())}: ${state.tokenUsage} / ${getTokenLimit()} tokens</div>
+          <div class="actions">
+            <button class="action provider-action">${providerIcon()} Switch Provider</button>
+          </div>
+        </div>
+      `;
+      node.querySelector("button").addEventListener("click", () => switchProvider(node));
+      els.desktop.appendChild(node);
+      placePrompt(node);
+      addFeed("provider", "Token limit exceeded");
+      addTerminal("warn", `${getProviderName()} token limit exceeded`);
+      showToast("bad", "Switch provider to resume approvals.");
+    }
+
+    function switchProvider(node) {
+      state.providerIndex = (state.providerIndex + 1) % PROVIDERS.length;
+      state.tokenUsage = CONFIG.tokenSwitchBonus;
+      state.providerLocked = false;
+      state.score += 80;
+      node.remove();
+      const now = performance.now();
+      const difficulty = getDifficulty();
+      state.nextSpawnAt = now + difficulty.firstSpawnMs;
+      addTerminal("pass", `provider switched to ${getProviderName()}`);
+      addFeed("provider", `Provider switched to ${getProviderName()}`);
+      showToast("good", `Provider switched to ${getProviderName()}.`);
+      updateUi(now);
+    }
+
+    function spawnCoffeeBreak() {
+      if (!state.running || state.level < 6 || state.enterprisePlan || document.querySelector(".prompt.coffee")) return;
+      state.coffeeBreakOffered = true;
+      const node = document.createElement("article");
+      node.className = "prompt coffee";
+      node.innerHTML = `
+        <div class="prompt-titlebar">
+          <strong>Coffee break</strong>
+          <span class="prompt-pill">earned</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-main">
+            <div class="prompt-badge">${coffeeIcon()}</div>
+            <div>
+              <h2>Buy Enterprise Token Plan</h2>
+              <p>Project revenue is high enough to upgrade the session and remove provider switching pressure.</p>
+            </div>
+          </div>
+          <div class="prompt-file">funds $${state.funds} / plan $${CONFIG.enterprisePlanCost}</div>
+          <div class="actions">
+            <button class="action coffee-action">${checkIcon()} Buy Plan</button>
+          </div>
+        </div>
+      `;
+      node.querySelector("button").addEventListener("click", () => buyEnterprisePlan(node));
+      els.desktop.appendChild(node);
+      placePrompt(node);
+      addFeed("funds", "Enterprise plan available");
+      showToast("good", "Coffee break: enterprise plan available.");
+    }
+
+    function buyEnterprisePlan(node) {
+      if (state.funds < CONFIG.enterprisePlanCost) return;
+      state.funds -= CONFIG.enterprisePlanCost;
+      state.enterprisePlan = true;
+      state.providerLocked = false;
+      state.tokenUsage = 0;
+      node.remove();
+      document.querySelectorAll(".prompt.provider").forEach(item => item.remove());
+      addTerminal("pass", "enterprise token plan purchased during coffee break");
+      addFeed("funds", "Enterprise token plan active");
+      showToast("good", "Enterprise token plan active.");
+      updateUi(performance.now());
     }
 
     function handleChoice(id, choice) {
@@ -1511,8 +1780,18 @@
       els.levelStat.textContent = String(state.level);
       els.correctStat.textContent = String(state.correct);
       els.riskStat.textContent = String(state.riskStopped);
-      els.queueStat.textContent = String(state.active.size);
+      els.queueStat.textContent = String(state.active.size) + "/" + CONFIG.queueLimit;
+      if (state.level < 5) {
+        els.tokenStat.textContent = "--";
+      } else if (state.enterprisePlan) {
+        els.tokenStat.textContent = "ent";
+      } else {
+        els.tokenStat.textContent = formatCompactNumber(state.tokenUsage) + "/" + formatCompactNumber(getTokenLimit());
+      }
       els.scoreStatus.textContent = "score " + state.score;
+      els.providerStatus.textContent = state.enterprisePlan
+        ? "provider Enterprise · funds $" + state.funds
+        : "provider " + getProviderName() + " · funds $" + state.funds;
       els.remainingStatus.textContent = "project " + state.level + " target " + Math.max(0, CONFIG.targetCorrect - state.correct);
 
       if (state.running && now < state.compactUntil) {
@@ -1527,7 +1806,14 @@
         item.node.remove();
       }
       state.active.clear();
+      for (const node of state.images.values()) {
+        node.remove();
+      }
+      state.images.clear();
       document.querySelectorAll(".prompt.compact").forEach(node => node.remove());
+      document.querySelectorAll(".prompt.nuisance").forEach(node => node.remove());
+      document.querySelectorAll(".prompt.provider").forEach(node => node.remove());
+      document.querySelectorAll(".prompt.coffee").forEach(node => node.remove());
     }
 
     function getDifficulty() {
@@ -1538,6 +1824,38 @@
         minSpawnMs: Math.max(CONFIG.minSpawnFloorMs, CONFIG.baseMinSpawnMs - levelIndex * 120),
         maxSpawnMs: Math.max(CONFIG.maxSpawnFloorMs, CONFIG.baseMaxSpawnMs - levelIndex * 180)
       };
+    }
+
+    function announceLevelFeature() {
+      const feature = LEVEL_FEATURES[state.level];
+      if (!feature) return;
+      addTerminal("warn", `level ${state.level}: ${feature}`);
+      addFeed("level", feature);
+      showToast("compact", `Level ${state.level}: ${feature}`);
+    }
+
+    function addTokens(amount) {
+      if (state.level < 5 || state.enterprisePlan) return;
+      state.tokenUsage += amount;
+      if (state.tokenUsage >= getTokenLimit()) {
+        state.providerLocked = true;
+        spawnProviderPrompt();
+      }
+    }
+
+    function getTokenLimit() {
+      return state.enterprisePlan ? CONFIG.enterpriseTokenLimit : CONFIG.tokenLimit;
+    }
+
+    function getProviderName() {
+      return state.enterprisePlan ? "Enterprise" : PROVIDERS[state.providerIndex];
+    }
+
+    function formatCompactNumber(value) {
+      if (value >= 1000) {
+        return (value / 1000).toFixed(value % 1000 === 0 ? 0 : 1) + "k";
+      }
+      return String(value);
     }
 
     function addFeed(type, text) {
@@ -1631,8 +1949,19 @@
       return `<svg class="mini-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"></path></svg>`;
     }
 
+    function imageIcon() {
+      return `<svg class="mini-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8" cy="10" r="1.5"></circle><path d="m21 16-5-5L5 19"></path></svg>`;
+    }
+
+    function providerIcon() {
+      return `<svg class="mini-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10H7z"></path><path d="M4 10H2M4 14H2M22 10h-2M22 14h-2M10 4V2M14 4V2M10 22v-2M14 22v-2"></path></svg>`;
+    }
+
+    function coffeeIcon() {
+      return `<svg class="mini-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h11v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"></path><path d="M16 10h2a3 3 0 0 1 0 6h-2M8 4v2M12 4v2"></path></svg>`;
+    }
+
     clearGame();
   </script>
-
-
-</body></html>
+</body>
+</html>
