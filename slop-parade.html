@@ -742,6 +742,19 @@
       background: #6e40c9;
     }
 
+    .prompt.confusing .action.accept,
+    .prompt.confusing .action.decline {
+      color: #dce4ee;
+      border-color: #596371;
+      background: #2f363f;
+    }
+
+    .prompt.confusing .action.accept:hover,
+    .prompt.confusing .action.decline:hover {
+      border-color: #788391;
+      background: #3a424d;
+    }
+
     .action.secondary-action {
       color: #fff6d6;
       border-color: rgba(217, 164, 65, .74);
@@ -1264,7 +1277,8 @@
       3: "Compact Context can now appear.",
       4: "Unrequested image generation can interrupt the session.",
       5: "Token limits can pause approvals until you switch providers.",
-      6: "Coffee break: project funds can buy the enterprise token plan."
+      6: "Coffee break: project funds can buy the enterprise token plan.",
+      7: "Approval buttons now match colors and can swap positions."
     };
 
     const els = {
@@ -1417,6 +1431,7 @@
 
       if (state.correct >= CONFIG.targetCorrect) {
         advanceProject(now);
+        state.animationFrame = requestAnimationFrame(tick);
         return;
       }
 
@@ -1494,7 +1509,12 @@
 
     function createPromptNode(id, prompt) {
       const node = document.createElement("article");
-      node.className = "prompt" + (prompt.kind === "bad" ? " danger" : "");
+      const confusingControls = state.level >= 7;
+      const acceptFirst = confusingControls && Math.random() < .5;
+      const acceptButton = `<button class="action accept" data-choice="accept">${checkIcon()} Accept</button>`;
+      const declineButton = `<button class="action decline" data-choice="decline">${xIcon()} Decline</button>`;
+      const actionButtons = acceptFirst ? acceptButton + declineButton : declineButton + acceptButton;
+      node.className = "prompt" + (prompt.kind === "bad" ? " danger" : "") + (confusingControls ? " confusing" : "");
       node.dataset.id = String(id);
       node.innerHTML = `
         <div class="prompt-titlebar">
@@ -1511,8 +1531,7 @@
           </div>
           <div class="prompt-file">${escapeHtml(prompt.file)}</div>
           <div class="actions">
-            <button class="action decline" data-choice="decline">${xIcon()} Decline</button>
-            <button class="action accept" data-choice="accept">${checkIcon()} Accept</button>
+            ${actionButtons}
           </div>
         </div>
       `;

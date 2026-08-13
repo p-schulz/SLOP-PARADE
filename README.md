@@ -19,7 +19,6 @@ Reach 100% project readiness before the two-minute timer expires. Completing a p
 - Level 5: token usage is tracked; if the active provider reaches its limit, approvals pause until the player switches providers.
 - Level 6: project funds unlock a coffee-break prompt to buy the enterprise token plan.
 - Level 7: Accept and Decline buttons use the same dark-gray styling, and their order can change between prompts.
-- Level 8 and later: no new systems are introduced; prompt pressure continues to increase.
 
 Approval prompts appear at random positions on the desktop:
 
