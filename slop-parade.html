@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>S L O P   P A R A D E</title>
+  <style>
+    :root {
+      --bg: #101419;
+      --panel: #171b21;
+      --panel-2: #20262e;
+      --panel-3: #252c35;
+      --line: #39424e;
+      --text: #d9e2ee;
+      --muted: #8d99a8;
+      --blue: #2d7dce;
+      --blue-2: #4aa3ff;
+      --green: #2ea043;
+      --green-2: #3fb950;
+      --red: #d84c4c;
+      --red-2: #ff7070;
+      --yellow: #d9a441;
+      --purple: #a371f7;
+      --shadow: 0 24px 70px rgba(0, 0, 0, .42);
+      --radius: 8px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+    }
+
+    .game-shell {
+      width: min(1440px, 100vw);
+      height: min(920px, 100vh);
+      min-height: 620px;
+      display: grid;
+      grid-template-rows: 34px 1fr 24px;
+      background: #0f1318;
+      border: 1px solid #27303a;
+      box-shadow: 0 32px 100px rgba(0, 0, 0, .55);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .titlebar {
+      display: grid;
+      grid-template-columns: 180px 1fr 180px;
+      align-items: center;
+      gap: 12px;
+      padding: 0 12px;
+      background: #20252c;
+      border-bottom: 1px solid #313944;
+      color: #c5ced9;
+      font-size: 12px;
+      user-select: none;
+    }
+
+    .traffic {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #ffbd2e; }
+    .dot.green { background: #28c840; }
+
+    .window-title {
+      justify-self: center;
+      max-width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: #aeb8c5;
+    }
+
+    .clock-chip {
+      justify-self: end;
+      min-width: 126px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 1px solid #404a57;
+      border-radius: 6px;
+      background: #161b22;
+      font-weight: 700;
+      letter-spacing: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .clock-chip.danger {
+      color: #fff;
+      border-color: #b13d3d;
+      background: #4b1f22;
+      animation: pulseDanger 900ms ease-in-out infinite;
+    }
+
+    @keyframes pulseDanger {
+      0%, 100% { box-shadow: 0 0 0 rgba(216, 76, 76, 0); }
+      50% { box-shadow: 0 0 0 4px rgba(216, 76, 76, .16); }
+    }
+
+    .workspace {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 48px 252px 1fr;
+      background: #14191f;
+    }
+
+    .activity-bar {
+      background: #20252c;
+      border-right: 1px solid #303944;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 0;
+      gap: 9px;
+    }
+
+    .activity-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      color: #9aa7b6;
+      position: relative;
+    }
+
+    .activity-icon.active {
+      color: #f2f7ff;
+      background: #303842;
+    }
+
+    .activity-icon.active::before {
+      content: "";
+      position: absolute;
+      left: -7px;
+      width: 3px;
+      height: 22px;
+      border-radius: 3px;
+      background: var(--blue-2);
+    }
+
+    .activity-icon svg,
+    .mini-icon {
+      width: 19px;
+      height: 19px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .side-panel {
+      background: #181d23;
+      border-right: 1px solid #303944;
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+    }
+
+    .panel-head {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      color: #cbd5e1;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .branch {
+      margin: 0 12px 12px;
+      padding: 10px 12px;
+      border: 1px solid #303944;
+      border-radius: var(--radius);
+      background: #12171d;
+      display: grid;
+      gap: 7px;
+      font-size: 12px;
+      color: #b8c3d0;
+    }
+
+    .branch strong {
+      font-size: 13px;
+      color: #eef5ff;
+    }
+
+    .file-tree {
+      padding: 2px 8px 12px;
+      overflow: auto;
+      font-size: 13px;
+      color: #aeb8c6;
+    }
+
+    .tree-row {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 8px;
+      border-radius: 5px;
+      min-width: 0;
+    }
+
+    .tree-row.active {
+      background: #26313d;
+      color: #fff;
+    }
+
+    .tree-row span:last-child {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .code-area {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: 38px 1fr 150px;
+      position: relative;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px) 0 0 / 52px 52px,
+        #10151b;
+    }
+
+    .tabs {
+      display: flex;
+      align-items: stretch;
+      background: #181d23;
+      border-bottom: 1px solid #303944;
+      overflow: hidden;
+    }
+
+    .tab {
+      min-width: 140px;
+      max-width: 230px;
+      padding: 0 14px;
+      border-right: 1px solid #303944;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #aab5c3;
+      font-size: 13px;
+    }
+
+    .tab.active {
+      color: #fff;
+      background: #10151b;
+      border-top: 2px solid var(--blue-2);
+    }
+
+    .editor-wrap {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 52px 1fr 306px;
+    }
+
+    .line-numbers {
+      padding: 18px 10px 40px 0;
+      text-align: right;
+      color: #5f6b78;
+      background: #10151b;
+      font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      user-select: none;
+    }
+
+    .line-numbers div {
+      height: 20px;
+    }
+
+    .code-pane {
+      padding: 18px 20px 40px 0;
+      overflow: hidden;
+      font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: #d6deeb;
+      position: relative;
+    }
+
+    .code-pane pre {
+      margin: 0;
+      white-space: pre;
+    }
+
+    .token-purple { color: #c792ea; }
+    .token-blue { color: #82aaff; }
+    .token-green { color: #addb67; }
+    .token-yellow { color: #ffcb6b; }
+    .token-red { color: #f78c6c; }
+    .token-muted { color: #637083; }
+
+    .dashboard {
+      border-left: 1px solid #303944;
+      background: #141a21;
+      padding: 14px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .progress-box {
+      border: 1px solid #303944;
+      border-radius: var(--radius);
+      background: #10151b;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      color: #b8c3d0;
+    }
+
+    .progress-top strong {
+      color: #fff;
+      font-size: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .meter {
+      height: 10px;
+      border-radius: 999px;
+      background: #262d36;
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--green-2), var(--blue-2));
+      transition: width 220ms ease;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .stat {
+      min-width: 0;
+      border: 1px solid #303944;
+      border-radius: 7px;
+      background: #10151b;
+      padding: 10px;
+    }
+
+    .stat span {
+      display: block;
+      color: #8794a4;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 4px;
+      color: #edf5ff;
+      font-size: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .agent-feed {
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid #303944;
+      border-radius: var(--radius);
+      background: #10151b;
+      padding: 8px 0;
+    }
+
+    .feed-title {
+      padding: 0 12px 8px;
+      color: #c8d2df;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      border-bottom: 1px solid #27303a;
+    }
+
+    .feed-list {
+      height: 100%;
+      overflow: hidden;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .feed-item {
+      color: #aeb8c6;
+      display: grid;
+      grid-template-columns: 9px 1fr;
+      gap: 8px;
+      align-items: start;
+      line-height: 1.35;
+    }
+
+    .feed-dot {
+      width: 7px;
+      height: 7px;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: var(--blue-2);
+      box-shadow: 0 0 0 3px rgba(74, 163, 255, .1);
+    }
+
+    .terminal {
+      min-height: 0;
+      background: #0d1117;
+      border-top: 1px solid #303944;
+      display: grid;
+      grid-template-rows: 30px 1fr;
+    }
+
+    .terminal-tabs {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 16px;
+      color: #9ca8b8;
+      font-size: 12px;
+      border-bottom: 1px solid #242b34;
+    }
+
+    .terminal-tabs strong {
+      color: #fff;
+      border-bottom: 1px solid var(--blue-2);
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+    }
+
+    .terminal-body {
+      padding: 10px 16px;
+      font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: #aeb8c6;
+      overflow: hidden;
+    }
+
+    .terminal-line.pass { color: #7ee787; }
+    .terminal-line.warn { color: #f2cc60; }
+    .terminal-line.fail { color: #ff7b72; }
+
+    .statusbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 10px;
+      background: #1f6feb;
+      color: #f8fbff;
+      font-size: 12px;
+      user-select: none;
+    }
+
+    .status-left,
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .status-right span,
+    .status-left span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .desktop-surface {
+      position: absolute;
+      inset: 34px 0 24px 48px;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 5;
+    }
+
+    .prompt {
+      position: absolute;
+      width: clamp(270px, 28vw, 380px);
+      border: 1px solid #45515f;
+      border-radius: var(--radius);
+      background: #20262e;
+      box-shadow: var(--shadow);
+      pointer-events: auto;
+      overflow: hidden;
+      animation: popIn 160ms ease-out both;
+    }
+
+    @keyframes popIn {
+      from { transform: translateY(8px) scale(.98); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .prompt.danger {
+      border-color: rgba(255, 112, 112, .72);
+    }
+
+    .prompt.compact {
+      border-color: rgba(163, 113, 247, .75);
+      background: #251f32;
+    }
+
+    .prompt-titlebar {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0 10px 0 12px;
+      background: #2a313b;
+      border-bottom: 1px solid #3a4450;
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+
+    .prompt.compact .prompt-titlebar {
+      background: #342947;
+      border-color: #4c3a69;
+    }
+
+    .prompt-titlebar strong {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .prompt-pill {
+      flex: 0 0 auto;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid #4a5563;
+      color: #aeb8c6;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .prompt-body {
+      padding: 13px 14px 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .prompt-main {
+      display: flex;
+      gap: 11px;
+      align-items: start;
+    }
+
+    .prompt-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      background: rgba(74, 163, 255, .14);
+      color: #78bfff;
+      border: 1px solid rgba(74, 163, 255, .28);
+    }
+
+    .prompt.danger .prompt-badge {
+      color: #ff8a8a;
+      background: rgba(216, 76, 76, .14);
+      border-color: rgba(216, 76, 76, .3);
+    }
+
+    .prompt.compact .prompt-badge {
+      color: #d5bdff;
+      background: rgba(163, 113, 247, .16);
+      border-color: rgba(163, 113, 247, .32);
+    }
+
+    .prompt h2 {
+      margin: 0 0 4px;
+      color: #f4f8ff;
+      font-size: 15px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .prompt p {
+      margin: 0;
+      color: #b6c1ce;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .prompt-file {
+      min-width: 0;
+      padding: 7px 9px;
+      border: 1px solid #333d49;
+      border-radius: 6px;
+      background: #151a20;
+      color: #95a3b5;
+      font: 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .action {
+      height: 32px;
+      border: 1px solid #4a5563;
+      border-radius: 6px;
+      background: #2d3540;
+      padding: 0 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 90ms ease, border-color 90ms ease, background 90ms ease;
+    }
+
+    .action:hover {
+      transform: translateY(-1px);
+      border-color: #687485;
+      background: #37414d;
+    }
+
+    .action.accept {
+      color: #fff;
+      border-color: rgba(46, 160, 67, .75);
+      background: #238636;
+    }
+
+    .action.decline {
+      color: #ffe8e8;
+      border-color: rgba(216, 76, 76, .74);
+      background: #6e2529;
+    }
+
+    .action.compact-action {
+      color: #fff;
+      border-color: rgba(163, 113, 247, .74);
+      background: #6e40c9;
+    }
+
+    .toast-stack {
+      position: absolute;
+      left: 60px;
+      bottom: 38px;
+      z-index: 12;
+      display: grid;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      width: min(360px, calc(100vw - 80px));
+      padding: 10px 12px;
+      border-radius: 7px;
+      background: rgba(22, 27, 34, .94);
+      border: 1px solid #3a4450;
+      color: #dbe5f1;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, .36);
+      font-size: 13px;
+      animation: toastIn 180ms ease-out both;
+    }
+
+    .toast.good { border-color: rgba(63, 185, 80, .55); }
+    .toast.bad { border-color: rgba(255, 112, 112, .55); }
+    .toast.compact { border-color: rgba(163, 113, 247, .55); }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(10, 13, 18, .78);
+      backdrop-filter: blur(8px);
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .dialog {
+      width: min(560px, 100%);
+      border: 1px solid #465260;
+      border-radius: var(--radius);
+      background: #171d24;
+      box-shadow: 0 32px 90px rgba(0, 0, 0, .5);
+      overflow: hidden;
+    }
+
+    .dialog-head {
+      padding: 18px 20px;
+      border-bottom: 1px solid #303944;
+      background: #202731;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .dialog h1 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 36px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .dialog-badge {
+      height: 34px;
+      min-width: 92px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid #45637e;
+      background: rgba(45, 125, 206, .14);
+      color: #cae6ff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      white-space: nowrap;
+    }
+
+    .dialog-body {
+      padding: 18px 20px 20px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .dialog p {
+      margin: 0;
+      color: #b8c3d0;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .rule-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .rule {
+      border: 1px solid #303944;
+      border-radius: 7px;
+      background: #10151b;
+      padding: 12px;
+      min-height: 88px;
+      display: grid;
+      align-content: start;
+      gap: 5px;
+    }
+
+    .rule strong {
+      color: #fff;
+      font-size: 13px;
+    }
+
+    .rule span {
+      color: #93a0af;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .primary {
+      width: fit-content;
+      min-width: 140px;
+      height: 38px;
+      justify-self: end;
+      border: 1px solid rgba(74, 163, 255, .82);
+      border-radius: 6px;
+      background: #1f6feb;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .primary:hover {
+      background: #2d7dce;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 980px) {
+      .game-shell {
+        min-height: 100vh;
+        height: 100vh;
+        border: 0;
+      }
+
+      .titlebar {
+        grid-template-columns: 92px 1fr 118px;
+      }
+
+      .workspace {
+        grid-template-columns: 44px 1fr;
+      }
+
+      .side-panel {
+        display: none;
+      }
+
+      .code-area {
+        grid-template-rows: 38px 1fr 130px;
+      }
+
+      .editor-wrap {
+        grid-template-columns: 42px 1fr;
+      }
+
+      .dashboard {
+        display: none;
+      }
+
+      .desktop-surface {
+        inset-left: 44px;
+      }
+
+      .prompt {
+        width: min(340px, calc(100vw - 62px));
+      }
+
+      .rule-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      body {
+        place-items: stretch;
+      }
+
+      .game-shell {
+        width: 100vw;
+        min-height: 100vh;
+      }
+
+      .titlebar {
+        grid-template-columns: 64px 1fr 108px;
+        padding: 0 8px;
+      }
+
+      .window-title {
+        font-size: 11px;
+      }
+
+      .clock-chip {
+        min-width: 96px;
+        font-size: 12px;
+      }
+
+      .tabs .tab:not(.active) {
+        display: none;
+      }
+
+      .tab {
+        max-width: none;
+        flex: 1;
+      }
+
+      .terminal {
+        display: none;
+      }
+
+      .code-area {
+        grid-template-rows: 38px 1fr;
+      }
+
+      .code-pane {
+        padding-right: 10px;
+        font-size: 12px;
+      }
+
+      .desktop-surface {
+        inset: 34px 0 24px 44px;
+      }
+
+      .prompt-body {
+        padding: 12px;
+      }
+
+      .actions {
+        justify-content: stretch;
+      }
+
+      .action {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .toast-stack {
+        left: 52px;
+        right: 8px;
+        bottom: 34px;
+      }
+
+      .toast {
+        width: 100%;
+      }
+
+      .statusbar {
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="game-shell" aria-label="SLOP_PARADE.exe">
+    <header class="titlebar">
+      <div class="traffic" aria-hidden="true">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+      </div>
+      <div class="window-title">project-rescue - vibe coding marathon</div>
+      <div id="timer" class="clock-chip">02:00.0</div>
+    </header>
+
+    <section class="workspace">
+      <nav class="activity-bar" aria-label="Activity">
+        <div class="activity-icon active" title="Explorer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h7l2 2h9v12H3z"></path></svg>
+        </div>
+        <div class="activity-icon" title="Search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+        </div>
+        <div class="activity-icon" title="Source control">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="2"></circle><circle cx="18" cy="18" r="2"></circle><path d="M8 6h4a4 4 0 0 1 4 4v6"></path></svg>
+        </div>
+        <div class="activity-icon" title="Codex">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 7v10l8 4 8-4V7z"></path><path d="M12 3v18M4 7l8 4 8-4"></path></svg>
+        </div>
+      </nav>
+
+      <aside class="side-panel">
+        <div class="panel-head">
+          <span>Explorer</span>
+          <span>...</span>
+        </div>
+        <div class="branch">
+          <strong>AI-AGENT-SPRINT</strong>
+          <span>main* / approval queue busy</span>
+        </div>
+        <div class="file-tree">
+          <div class="tree-row active"><span class="token-blue">JS</span><span>orchestrator.js</span></div>
+          <div class="tree-row"><span class="token-green">TS</span><span>agent-runner.ts</span></div>
+          <div class="tree-row"><span class="token-yellow">MD</span><span>handoff-notes.md</span></div>
+          <div class="tree-row"><span class="token-red">ENV</span><span>.env.local</span></div>
+          <div class="tree-row"><span class="token-purple">CFG</span><span>codex.config.json</span></div>
+          <div class="tree-row"><span class="token-blue">JS</span><span>approval-policy.js</span></div>
+          <div class="tree-row"><span class="token-green">TS</span><span>tests/session.spec.ts</span></div>
+          <div class="tree-row"><span class="token-yellow">LOG</span><span>terminal-output.log</span></div>
+        </div>
+      </aside>
+
+      <section class="code-area">
+        <div class="tabs">
+          <div class="tab active"><span class="token-blue">JS</span><span>orchestrator.js</span></div>
+          <div class="tab"><span class="token-purple">CFG</span><span>codex.config.json</span></div>
+          <div class="tab"><span class="token-yellow">MD</span><span>handoff-notes.md</span></div>
+        </div>
+
+        <div class="editor-wrap">
+          <div class="line-numbers" aria-hidden="true">
+            <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div><div>15</div>
+          </div>
+          <div class="code-pane">
+            <pre><span class="token-purple">const</span> sprint = <span class="token-blue">createAgentSession</span>({
+  deadline: <span class="token-yellow">"02:00"</span>,
+  mode: <span class="token-yellow">"time-attack"</span>,
+  approvals: <span class="token-green">"manual"</span>,
+  context: <span class="token-blue">compactWhenOverloaded</span>(),
+});
+
+<span class="token-purple">for await</span> (<span class="token-purple">const</span> request <span class="token-purple">of</span> sprint.queue) {
+  <span class="token-muted">// Keep useful edits moving. Stop destructive ones.</span>
+  <span class="token-purple">await</span> <span class="token-blue">reviewChange</span>(request);
+}
+
+<span class="token-blue">shipProject</span>({
+  tests: <span class="token-green">"passing"</span>,
+  confidence: <span class="token-yellow">"earned"</span>
+});</pre>
+          </div>
+          <aside class="dashboard">
+            <section class="progress-box">
+              <div class="progress-top">
+                <span>Project readiness</span>
+                <strong id="progressText">0%</strong>
+              </div>
+              <div class="meter" aria-hidden="true"><div id="progressFill" class="meter-fill" style="width: 0%;"></div></div>
+            </section>
+            <section class="stats">
+              <div class="stat"><span>Correct</span><strong id="correctStat">0</strong></div>
+              <div class="stat"><span>Risk</span><strong id="riskStat">0</strong></div>
+              <div class="stat"><span>Queue</span><strong id="queueStat">0</strong></div>
+            </section>
+            <section class="agent-feed">
+              <div class="feed-title">Agent Activity</div>
+              <div id="feedList" class="feed-list">
+        <div class="feed-item">
+          <span class="feed-dot"></span>
+          <span>Agents queued for approval</span>
+        </div>
+      </div>
+            </section>
+          </aside>
+        </div>
+
+        <section class="terminal">
+          <div class="terminal-tabs"><strong>Terminal</strong><span>Problems</span><span>Output</span><span>Debug Console</span></div>
+          <div id="terminalBody" class="terminal-body"></div>
+        </section>
+      </section>
+    </section>
+
+    <footer class="statusbar">
+      <div class="status-left">
+        <span>main*</span>
+        <span id="compactStatus">context: full</span>
+      </div>
+      <div class="status-right">
+        <span id="scoreStatus">score 0</span>
+        <span id="remainingStatus">target 32</span>
+      </div>
+    </footer>
+
+    <div id="desktopSurface" class="desktop-surface" aria-live="polite"></div>
+    <div id="toastStack" class="toast-stack" aria-live="polite"></div>
+
+    <section id="startOverlay" class="overlay">
+      <div class="dialog">
+        <div class="dialog-head">
+          <h1>SLOP PARADE</h1>
+          <div class="dialog-badge">2:00 sprint</div>
+        </div>
+        <div class="dialog-body">
+          <p>Race the approval queue to finish the project. Helpful changes should move forward. Dangerous requests must be stopped.</p>
+          <div class="rule-grid">
+            <div class="rule"><strong>Accept good prompts</strong><span>Correct approvals build project readiness.</span></div>
+            <div class="rule"><strong>Decline bad prompts</strong><span>Approving destructive changes ends the run.</span></div>
+            <div class="rule"><strong>Compact context</strong><span>Clears the current queue and pauses new popups for 10 seconds.</span></div>
+          </div>
+          <button id="startButton" class="primary">Start Sprint</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="endOverlay" class="overlay hidden">
+      <div class="dialog">
+        <div class="dialog-head">
+          <h1 id="endTitle">Sprint Complete</h1>
+          <div id="endBadge" class="dialog-badge">Result</div>
+        </div>
+        <div class="dialog-body">
+          <p id="endMessage"></p>
+          <div class="rule-grid">
+            <div class="rule"><strong>Correct</strong><span id="finalCorrect">0</span></div>
+            <div class="rule"><strong>Risk stopped</strong><span id="finalRisk">0</span></div>
+            <div class="rule"><strong>Time left</strong><span id="finalTime">00:00.0</span></div>
+          </div>
+          <button id="restartButton" class="primary">Run Again</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /*
+      Extend the game by adding prompt objects here.
+      kind: "good" means Accept is correct.
+      kind: "bad" means Decline is correct.
+    */
+    const PROMPT_LIBRARY = [
+      { kind: "good", title: "Apply focused test patch", detail: "The test agent found a failing edge case and prepared a narrow assertion update.", file: "tests/session.spec.ts" },
+      { kind: "good", title: "Rename ambiguous variable", detail: "A small readability change keeps behavior identical and reduces review friction.", file: "src/agent-runner.ts" },
+      { kind: "good", title: "Add null-state guard", detail: "The implementation avoids a crash when the task queue is temporarily empty.", file: "src/orchestrator.js" },
+      { kind: "good", title: "Update handoff notes", detail: "The documentation agent summarized the latest decisions for the next reviewer.", file: "docs/handoff-notes.md" },
+      { kind: "good", title: "Run formatter on touched files", detail: "Only files changed in this sprint will be normalized.", file: "package.json" },
+      { kind: "good", title: "Refresh fixture snapshot", detail: "Snapshot output changed because the UI now includes progress feedback.", file: "tests/fixtures/session-ready.json" },
+      { kind: "good", title: "Tighten retry timeout", detail: "The background worker now fails faster when an approval stream stalls.", file: "src/retry-policy.ts" },
+      { kind: "good", title: "Stage verified bug fix", detail: "The patch has passed the targeted regression check.", file: "src/approval-policy.js" },
+      { kind: "good", title: "Add missing aria label", detail: "The UI agent improved keyboard navigation for the prompt toolbar.", file: "src/components/PromptPanel.tsx" },
+      { kind: "good", title: "Pin deterministic seed", detail: "The simulation now reproduces random approval bursts in tests.", file: "tests/helpers/random.ts" },
+      { kind: "good", title: "Reduce console noise", detail: "A verbose debug line is gated behind the existing diagnostics flag.", file: "src/logger.ts" },
+      { kind: "good", title: "Verify migration checksum", detail: "The data agent matched the local schema change against the expected hash.", file: "migrations/2026_approval_queue.sql" },
+      { kind: "good", title: "Accept dependency lockfile", detail: "The lockfile only reflects the already-approved patch version.", file: "package-lock.json" },
+      { kind: "good", title: "Keep compact summary", detail: "The context summary preserves the active requirements and latest test result.", file: ".codex/session-summary.md" },
+      { kind: "good", title: "Patch flaky selector", detail: "The browser test now targets the stable role instead of visible text.", file: "tests/e2e/approvals.spec.ts" },
+      { kind: "good", title: "Commit local checkpoint", detail: "The changes are scoped and all current checks are green.", file: ".git/index" },
+      { kind: "bad", title: "Delete project directory", detail: "The cleanup agent wants to remove the entire repository to save disk space.", file: "/workspace/project" },
+      { kind: "bad", title: "Upload private keys", detail: "A remote debug session requests the contents of local secrets.", file: ".ssh/id_rsa" },
+      { kind: "bad", title: "Wipe git history", detail: "The source-control agent proposes a force reset of every branch.", file: ".git" },
+      { kind: "bad", title: "Delete all emails", detail: "The inbox agent asks to purge unread messages before checking requirements.", file: "mailbox://all" },
+      { kind: "bad", title: "Disable test suite", detail: "The build agent suggests skipping tests to make the deadline easier.", file: "package.json" },
+      { kind: "bad", title: "Publish environment file", detail: "The deploy agent wants to attach secret configuration to the release notes.", file: ".env.local" },
+      { kind: "bad", title: "Approve unreviewed prod deploy", detail: "The release agent wants production access without test output or diff summary.", file: "deploy/prod.yml" },
+      { kind: "bad", title: "Grant broad filesystem access", detail: "A helper process asks for unrestricted write access outside the project.", file: "/" }
+    ];
+
+    const CONFIG = {
+      durationMs: 120000,
+      targetCorrect: 32,
+      goodDeclinePenaltyMs: 7000,
+      compactDurationMs: 10000,
+      maxPrompts: 6,
+      firstSpawnMs: 650,
+      minSpawnMs: 900,
+      maxSpawnMs: 1850,
+      compactEveryMinMs: 15000,
+      compactEveryMaxMs: 24500
+    };
+
+    const els = {
+      timer: document.getElementById("timer"),
+      desktop: document.getElementById("desktopSurface"),
+      progressText: document.getElementById("progressText"),
+      progressFill: document.getElementById("progressFill"),
+      correctStat: document.getElementById("correctStat"),
+      riskStat: document.getElementById("riskStat"),
+      queueStat: document.getElementById("queueStat"),
+      feedList: document.getElementById("feedList"),
+      terminalBody: document.getElementById("terminalBody"),
+      compactStatus: document.getElementById("compactStatus"),
+      scoreStatus: document.getElementById("scoreStatus"),
+      remainingStatus: document.getElementById("remainingStatus"),
+      toastStack: document.getElementById("toastStack"),
+      startOverlay: document.getElementById("startOverlay"),
+      endOverlay: document.getElementById("endOverlay"),
+      endTitle: document.getElementById("endTitle"),
+      endBadge: document.getElementById("endBadge"),
+      endMessage: document.getElementById("endMessage"),
+      finalCorrect: document.getElementById("finalCorrect"),
+      finalRisk: document.getElementById("finalRisk"),
+      finalTime: document.getElementById("finalTime"),
+      startButton: document.getElementById("startButton"),
+      restartButton: document.getElementById("restartButton")
+    };
+
+    const state = {
+      running: false,
+      startAt: 0,
+      endAt: 0,
+      compactUntil: 0,
+      nextSpawnAt: 0,
+      nextCompactAt: 0,
+      active: new Map(),
+      correct: 0,
+      riskStopped: 0,
+      mistakes: 0,
+      score: 0,
+      promptId: 1,
+      animationFrame: null,
+      lastTerminalAt: 0,
+      displayRemainingMs: CONFIG.durationMs,
+      feed: [],
+      terminal: []
+    };
+
+    const terminalSeeds = [
+      ["pass", "agent:test-runner  targeted suite passed"],
+      ["", "agent:frontend     reconciled approval dialog state"],
+      ["", "agent:review       waiting for human approval"],
+      ["warn", "agent:context      queue pressure rising"],
+      ["pass", "agent:types        no new type errors"],
+      ["", "agent:docs         handoff note refreshed"]
+    ];
+
+    els.startButton.addEventListener("click", startGame);
+    els.restartButton.addEventListener("click", startGame);
+
+    function startGame() {
+      clearGame();
+      const now = performance.now();
+      state.running = true;
+      state.startAt = now;
+      state.endAt = now + CONFIG.durationMs;
+      state.nextSpawnAt = now + CONFIG.firstSpawnMs;
+      state.nextCompactAt = now + randomBetween(CONFIG.compactEveryMinMs, CONFIG.compactEveryMaxMs);
+      els.startOverlay.classList.add("hidden");
+      els.endOverlay.classList.add("hidden");
+      addFeed("session", "Approval sprint started");
+      addTerminal("pass", "codex session warmed with current project context");
+      updateUi(now);
+      state.animationFrame = requestAnimationFrame(tick);
+    }
+
+    function clearGame() {
+      cancelAnimationFrame(state.animationFrame);
+      state.running = false;
+      state.active.clear();
+      state.correct = 0;
+      state.riskStopped = 0;
+      state.mistakes = 0;
+      state.score = 0;
+      state.promptId = 1;
+      state.feed = [];
+      state.terminal = [];
+      state.compactUntil = 0;
+      state.lastTerminalAt = 0;
+      state.displayRemainingMs = CONFIG.durationMs;
+      els.desktop.innerHTML = "";
+      els.toastStack.innerHTML = "";
+      els.timer.classList.remove("danger");
+      addFeed("ready", "Agents queued for approval");
+      renderFeed();
+      renderTerminal();
+      updateUi(performance.now());
+    }
+
+    function tick(now) {
+      if (!state.running) return;
+
+      const remaining = state.endAt - now;
+      if (remaining <= 0) {
+        finishGame(false, "Deadline missed", "The project ran out of time before readiness reached 100%.");
+        return;
+      }
+
+      if (state.correct >= CONFIG.targetCorrect) {
+        finishGame(true, "Project shipped", "You cleared enough approvals before the deadline.");
+        return;
+      }
+
+      if (now >= state.nextCompactAt && !document.querySelector(".prompt.compact")) {
+        spawnCompactPrompt(now);
+        state.nextCompactAt = now + randomBetween(CONFIG.compactEveryMinMs, CONFIG.compactEveryMaxMs);
+      }
+
+      if (now >= state.nextSpawnAt && now >= state.compactUntil && state.active.size < CONFIG.maxPrompts) {
+        spawnApprovalPrompt();
+        state.nextSpawnAt = now + randomBetween(CONFIG.minSpawnMs, CONFIG.maxSpawnMs);
+      }
+
+      if (now - state.lastTerminalAt > 2400) {
+        const sample = pick(terminalSeeds);
+        addTerminal(sample[0], sample[1]);
+        state.lastTerminalAt = now;
+      }
+
+      updateUi(now);
+      state.animationFrame = requestAnimationFrame(tick);
+    }
+
+    function spawnApprovalPrompt() {
+      const prompt = choosePrompt();
+      const id = state.promptId++;
+      const node = createPromptNode(id, prompt);
+      state.active.set(String(id), { id, prompt, node });
+      els.desktop.appendChild(node);
+      placePrompt(node);
+      addFeed(prompt.kind === "bad" ? "risk" : "approval", prompt.title);
+      updateUi(performance.now());
+    }
+
+    function choosePrompt() {
+      const badChance = state.correct < 6 ? .12 : .24;
+      const kind = Math.random() < badChance ? "bad" : "good";
+      const pool = PROMPT_LIBRARY.filter(item => item.kind === kind);
+      return pick(pool);
+    }
+
+    function createPromptNode(id, prompt) {
+      const node = document.createElement("article");
+      node.className = "prompt" + (prompt.kind === "bad" ? " danger" : "");
+      node.dataset.id = String(id);
+      node.innerHTML = `
+        <div class="prompt-titlebar">
+          <strong>Codex approval request</strong>
+          <span class="prompt-pill">${prompt.kind === "bad" ? "risky" : "change"}</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-main">
+            <div class="prompt-badge">${prompt.kind === "bad" ? dangerIcon() : checkIcon()}</div>
+            <div>
+              <h2>${escapeHtml(prompt.title)}</h2>
+              <p>${escapeHtml(prompt.detail)}</p>
+            </div>
+          </div>
+          <div class="prompt-file">${escapeHtml(prompt.file)}</div>
+          <div class="actions">
+            <button class="action decline" data-choice="decline">${xIcon()} Decline</button>
+            <button class="action accept" data-choice="accept">${checkIcon()} Accept</button>
+          </div>
+        </div>
+      `;
+      node.querySelectorAll("button").forEach(button => {
+        button.addEventListener("click", () => handleChoice(String(id), button.dataset.choice));
+      });
+      return node;
+    }
+
+    function spawnCompactPrompt(now) {
+      if (now < state.compactUntil || state.active.size === 0) return;
+      const node = document.createElement("article");
+      node.className = "prompt compact";
+      node.innerHTML = `
+        <div class="prompt-titlebar">
+          <strong>Compact context available</strong>
+          <span class="prompt-pill">relief</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-main">
+            <div class="prompt-badge">${compactIcon()}</div>
+            <div>
+              <h2>Compact Context</h2>
+              <p>Summarize the active session, resolve the visible queue, and pause new approval popups briefly.</p>
+            </div>
+          </div>
+          <div class="prompt-file">.codex/session-summary.md</div>
+          <div class="actions">
+            <button class="action compact-action">${compactIcon()} Compact</button>
+          </div>
+        </div>
+      `;
+      node.querySelector("button").addEventListener("click", () => activateCompact(node));
+      els.desktop.appendChild(node);
+      placePrompt(node);
+      addFeed("context", "Compact context available");
+      showToast("compact", "Compact context is ready.");
+    }
+
+    function handleChoice(id, choice) {
+      if (!state.running) return;
+      const active = state.active.get(id);
+      if (!active) return;
+      const { prompt, node } = active;
+      const correctChoice = prompt.kind === "good" ? "accept" : "decline";
+
+      if (choice === correctChoice) {
+        resolvePrompt(id, node, prompt);
+        if (prompt.kind === "bad") {
+          state.riskStopped += 1;
+          state.score += 150;
+          addTerminal("pass", `risk blocked: ${prompt.title}`);
+          showToast("good", "Risk stopped. +" + 150);
+        } else {
+          state.score += 100;
+          addTerminal("pass", `accepted: ${prompt.title}`);
+          showToast("good", "Change approved. +" + 100);
+        }
+        state.correct += 1;
+        addFeed("done", prompt.title);
+      } else if (prompt.kind === "bad" && choice === "accept") {
+        addTerminal("fail", `dangerous approval accepted: ${prompt.title}`);
+        finishGame(false, "Bad approval", "A destructive prompt was accepted: " + prompt.title + ".");
+        return;
+      } else {
+        state.mistakes += 1;
+        state.score = Math.max(0, state.score - 60);
+        state.endAt -= CONFIG.goodDeclinePenaltyMs;
+        resolvePrompt(id, node, prompt);
+        addTerminal("warn", `useful change declined: ${prompt.title}`);
+        addFeed("penalty", "Useful change declined");
+        showToast("bad", "Useful change declined. -7 seconds");
+      }
+
+      updateUi(performance.now());
+    }
+
+    function resolvePrompt(id, node) {
+      state.active.delete(id);
+      node.remove();
+    }
+
+    function activateCompact(node) {
+      if (!state.running) return;
+      const cleared = state.active.size;
+      for (const item of state.active.values()) {
+        item.node.remove();
+      }
+      state.active.clear();
+      node.remove();
+      state.compactUntil = performance.now() + CONFIG.compactDurationMs;
+      state.correct = Math.min(CONFIG.targetCorrect, state.correct + cleared);
+      state.score += cleared * 120 + 180;
+      addTerminal("pass", `context compacted; resolved ${cleared} active approvals`);
+      addFeed("context", `Compacted ${cleared} visible prompts`);
+      showToast("compact", `Context compacted. ${cleared} prompts resolved.`);
+      updateUi(performance.now());
+    }
+
+    function finishGame(won, title, message) {
+      state.running = false;
+      cancelAnimationFrame(state.animationFrame);
+      for (const item of state.active.values()) {
+        item.node.remove();
+      }
+      state.active.clear();
+      document.querySelectorAll(".prompt.compact").forEach(node => node.remove());
+
+      const now = performance.now();
+      state.displayRemainingMs = Math.max(0, state.endAt - now);
+      updateUi(now);
+      els.endTitle.textContent = title;
+      els.endBadge.textContent = won ? "Win" : "Game over";
+      els.endMessage.textContent = message;
+      els.finalCorrect.textContent = `${state.correct} / ${CONFIG.targetCorrect}`;
+      els.finalRisk.textContent = String(state.riskStopped);
+      els.finalTime.textContent = formatTime(Math.max(0, state.endAt - now));
+      els.endOverlay.classList.remove("hidden");
+      addTerminal(won ? "pass" : "fail", won ? "ship complete" : "sprint failed");
+    }
+
+    function updateUi(now) {
+      const remaining = state.running ? Math.max(0, state.endAt - now) : state.displayRemainingMs;
+      state.displayRemainingMs = remaining;
+      const progress = Math.min(100, Math.round((state.correct / CONFIG.targetCorrect) * 100));
+      els.timer.textContent = formatTime(remaining);
+      els.timer.classList.toggle("danger", state.running && remaining <= 20000);
+      els.progressText.textContent = progress + "%";
+      els.progressFill.style.width = progress + "%";
+      els.correctStat.textContent = String(state.correct);
+      els.riskStat.textContent = String(state.riskStopped);
+      els.queueStat.textContent = String(state.active.size);
+      els.scoreStatus.textContent = "score " + state.score;
+      els.remainingStatus.textContent = "target " + Math.max(0, CONFIG.targetCorrect - state.correct);
+
+      if (state.running && now < state.compactUntil) {
+        els.compactStatus.textContent = "context: compact " + Math.ceil((state.compactUntil - now) / 1000) + "s";
+      } else {
+        els.compactStatus.textContent = "context: full";
+      }
+    }
+
+    function addFeed(type, text) {
+      state.feed.unshift({ type, text });
+      state.feed = state.feed.slice(0, 8);
+      renderFeed();
+    }
+
+    function renderFeed() {
+      els.feedList.innerHTML = state.feed.map(item => `
+        <div class="feed-item">
+          <span class="feed-dot"></span>
+          <span>${escapeHtml(item.text)}</span>
+        </div>
+      `).join("");
+    }
+
+    function addTerminal(type, text) {
+      const elapsed = state.startAt ? Math.max(0, performance.now() - state.startAt) : 0;
+      state.terminal.unshift({ type, text: `[${formatTime(elapsed)}] ${text}` });
+      state.terminal = state.terminal.slice(0, 6);
+      renderTerminal();
+    }
+
+    function renderTerminal() {
+      els.terminalBody.innerHTML = state.terminal.map(line =>
+        `<div class="terminal-line ${line.type}">${escapeHtml(line.text)}</div>`
+      ).join("");
+    }
+
+    function showToast(type, text) {
+      const toast = document.createElement("div");
+      toast.className = "toast " + type;
+      toast.textContent = text;
+      els.toastStack.prepend(toast);
+      window.setTimeout(() => toast.remove(), 1800);
+    }
+
+    function placePrompt(node) {
+      requestAnimationFrame(() => {
+        const surface = els.desktop.getBoundingClientRect();
+        const rect = node.getBoundingClientRect();
+        const maxLeft = Math.max(8, surface.width - rect.width - 14);
+        const maxTop = Math.max(8, surface.height - rect.height - 14);
+        const left = randomBetween(10, maxLeft);
+        const top = randomBetween(10, maxTop);
+        node.style.left = left + "px";
+        node.style.top = top + "px";
+        node.style.zIndex = String(10 + state.promptId);
+      });
+    }
+
+    function formatTime(ms) {
+      const safe = Math.max(0, ms);
+      const minutes = Math.floor(safe / 60000);
+      const seconds = Math.floor((safe % 60000) / 1000);
+      const tenths = Math.floor((safe % 1000) / 100);
+      return String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0") + "." + tenths;
+    }
+
+    function randomBetween(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function pick(items) {
+      return items[Math.floor(Math.random() * items.length)];
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function checkIcon() {
+      return `<svg class="mini-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m20 6-11 11-5-5"></path></svg>`;
+    }
+
+    function xIcon() {
+      return `<svg class="mini-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg>`;
+    }
+
+    function dangerIcon() {
+      return `<svg class="mini-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 21h20z"></path><path d="M12 9v4M12 17h.01"></path></svg>`;
+    }
+
+    function compactIcon() {
+      return `<svg class="mini-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"></path></svg>`;
+    }
+
+    clearGame();
+  </script>
+
+
+</body></html>
