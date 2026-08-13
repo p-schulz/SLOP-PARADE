@@ -1,8 +1,9 @@
 <!DOCTYPE html>
+<!-- saved from url=(0125)file:///Users/schulz/Documents/Codex/2026-08-13/referenced-chatgpt-conversation-this-is-an-2/outputs/codex-approval-rush.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>S L O P   P A R A D E</title>
+  <title>SLOP PARADE</title>
   <style>
     :root {
       --bg: #101419;
@@ -40,8 +41,7 @@
     }
 
     body {
-      display: grid;
-      place-items: center;
+      display: block;
     }
 
     button {
@@ -50,14 +50,14 @@
     }
 
     .game-shell {
-      width: min(1440px, 100vw);
-      height: min(920px, 100vh);
-      min-height: 620px;
+      width: 100vw;
+      height: 100vh;
+      min-height: 0;
       display: grid;
       grid-template-rows: 34px 1fr 24px;
       background: #0f1318;
-      border: 1px solid #27303a;
-      box-shadow: 0 32px 100px rgba(0, 0, 0, .55);
+      border: 0;
+      box-shadow: none;
       position: relative;
       overflow: hidden;
     }
@@ -376,7 +376,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
     }
 
@@ -971,14 +971,14 @@
   </style>
 </head>
 <body>
-  <main class="game-shell" aria-label="SLOP_PARADE.exe">
+  <main class="game-shell" aria-label="SLOP PARADE game">
     <header class="titlebar">
       <div class="traffic" aria-hidden="true">
         <span class="dot red"></span>
         <span class="dot yellow"></span>
         <span class="dot green"></span>
       </div>
-      <div class="window-title">project-rescue - vibe coding marathon</div>
+      <div class="window-title">project-rescue - SLOP PARADE</div>
       <div id="timer" class="clock-chip">02:00.0</div>
     </header>
 
@@ -1051,12 +1051,13 @@
           <aside class="dashboard">
             <section class="progress-box">
               <div class="progress-top">
-                <span>Project readiness</span>
+                <span id="progressLabel">Project 1 readiness</span>
                 <strong id="progressText">0%</strong>
               </div>
               <div class="meter" aria-hidden="true"><div id="progressFill" class="meter-fill" style="width: 0%;"></div></div>
             </section>
             <section class="stats">
+              <div class="stat"><span>Level</span><strong id="levelStat">1</strong></div>
               <div class="stat"><span>Correct</span><strong id="correctStat">0</strong></div>
               <div class="stat"><span>Risk</span><strong id="riskStat">0</strong></div>
               <div class="stat"><span>Queue</span><strong id="queueStat">0</strong></div>
@@ -1087,7 +1088,7 @@
       </div>
       <div class="status-right">
         <span id="scoreStatus">score 0</span>
-        <span id="remainingStatus">target 32</span>
+        <span id="remainingStatus">project 1 target 32</span>
       </div>
     </footer>
 
@@ -1098,16 +1099,16 @@
       <div class="dialog">
         <div class="dialog-head">
           <h1>SLOP PARADE</h1>
-          <div class="dialog-badge">2:00 sprint</div>
+          <div class="dialog-badge">2:00 rounds</div>
         </div>
         <div class="dialog-body">
-          <p>Race the approval queue to finish the project. Helpful changes should move forward. Dangerous requests must be stopped.</p>
+          <p>Finish each project before the two-minute deadline. Reaching 100% readiness advances to the next project, where prompt pressure increases.</p>
           <div class="rule-grid">
             <div class="rule"><strong>Accept good prompts</strong><span>Correct approvals build project readiness.</span></div>
             <div class="rule"><strong>Decline bad prompts</strong><span>Approving destructive changes ends the run.</span></div>
             <div class="rule"><strong>Compact context</strong><span>Clears the current queue and pauses new popups for 10 seconds.</span></div>
           </div>
-          <button id="startButton" class="primary">Start Sprint</button>
+          <button id="startButton" class="primary">Start Parade</button>
         </div>
       </div>
     </section>
@@ -1115,15 +1116,15 @@
     <section id="endOverlay" class="overlay hidden">
       <div class="dialog">
         <div class="dialog-head">
-          <h1 id="endTitle">Sprint Complete</h1>
+          <h1 id="endTitle">Run Complete</h1>
           <div id="endBadge" class="dialog-badge">Result</div>
         </div>
         <div class="dialog-body">
           <p id="endMessage"></p>
           <div class="rule-grid">
+            <div class="rule"><strong>Project reached</strong><span id="finalLevel">1</span></div>
             <div class="rule"><strong>Correct</strong><span id="finalCorrect">0</span></div>
             <div class="rule"><strong>Risk stopped</strong><span id="finalRisk">0</span></div>
-            <div class="rule"><strong>Time left</strong><span id="finalTime">00:00.0</span></div>
           </div>
           <button id="restartButton" class="primary">Run Again</button>
         </div>
@@ -1169,10 +1170,13 @@
       targetCorrect: 32,
       goodDeclinePenaltyMs: 7000,
       compactDurationMs: 10000,
-      maxPrompts: 6,
-      firstSpawnMs: 650,
-      minSpawnMs: 900,
-      maxSpawnMs: 1850,
+      baseMaxPrompts: 3,
+      maxPromptCap: 8,
+      baseFirstSpawnMs: 1100,
+      baseMinSpawnMs: 1500,
+      baseMaxSpawnMs: 2800,
+      minSpawnFloorMs: 520,
+      maxSpawnFloorMs: 1050,
       compactEveryMinMs: 15000,
       compactEveryMaxMs: 24500
     };
@@ -1181,7 +1185,9 @@
       timer: document.getElementById("timer"),
       desktop: document.getElementById("desktopSurface"),
       progressText: document.getElementById("progressText"),
+      progressLabel: document.getElementById("progressLabel"),
       progressFill: document.getElementById("progressFill"),
+      levelStat: document.getElementById("levelStat"),
       correctStat: document.getElementById("correctStat"),
       riskStat: document.getElementById("riskStat"),
       queueStat: document.getElementById("queueStat"),
@@ -1196,9 +1202,9 @@
       endTitle: document.getElementById("endTitle"),
       endBadge: document.getElementById("endBadge"),
       endMessage: document.getElementById("endMessage"),
+      finalLevel: document.getElementById("finalLevel"),
       finalCorrect: document.getElementById("finalCorrect"),
       finalRisk: document.getElementById("finalRisk"),
-      finalTime: document.getElementById("finalTime"),
       startButton: document.getElementById("startButton"),
       restartButton: document.getElementById("restartButton")
     };
@@ -1211,7 +1217,9 @@
       nextSpawnAt: 0,
       nextCompactAt: 0,
       active: new Map(),
+      level: 1,
       correct: 0,
+      totalCorrect: 0,
       riskStopped: 0,
       mistakes: 0,
       score: 0,
@@ -1240,13 +1248,11 @@
       const now = performance.now();
       state.running = true;
       state.startAt = now;
-      state.endAt = now + CONFIG.durationMs;
-      state.nextSpawnAt = now + CONFIG.firstSpawnMs;
-      state.nextCompactAt = now + randomBetween(CONFIG.compactEveryMinMs, CONFIG.compactEveryMaxMs);
+      startProject(now);
       els.startOverlay.classList.add("hidden");
       els.endOverlay.classList.add("hidden");
-      addFeed("session", "Approval sprint started");
-      addTerminal("pass", "codex session warmed with current project context");
+      addFeed("session", "Project 1 approval sprint started");
+      addTerminal("pass", "project 1 warmed with current context");
       updateUi(now);
       state.animationFrame = requestAnimationFrame(tick);
     }
@@ -1255,7 +1261,9 @@
       cancelAnimationFrame(state.animationFrame);
       state.running = false;
       state.active.clear();
+      state.level = 1;
       state.correct = 0;
+      state.totalCorrect = 0;
       state.riskStopped = 0;
       state.mistakes = 0;
       state.score = 0;
@@ -1274,17 +1282,28 @@
       updateUi(performance.now());
     }
 
+    function startProject(now) {
+      clearPrompts();
+      state.correct = 0;
+      state.compactUntil = 0;
+      state.endAt = now + CONFIG.durationMs;
+      state.displayRemainingMs = CONFIG.durationMs;
+      const difficulty = getDifficulty();
+      state.nextSpawnAt = now + difficulty.firstSpawnMs;
+      state.nextCompactAt = now + randomBetween(CONFIG.compactEveryMinMs, CONFIG.compactEveryMaxMs);
+    }
+
     function tick(now) {
       if (!state.running) return;
 
       const remaining = state.endAt - now;
       if (remaining <= 0) {
-        finishGame(false, "Deadline missed", "The project ran out of time before readiness reached 100%.");
+        finishGame(false, "Deadline missed", `Project ${state.level} ran out of time before readiness reached 100%.`);
         return;
       }
 
       if (state.correct >= CONFIG.targetCorrect) {
-        finishGame(true, "Project shipped", "You cleared enough approvals before the deadline.");
+        advanceProject(now);
         return;
       }
 
@@ -1293,9 +1312,10 @@
         state.nextCompactAt = now + randomBetween(CONFIG.compactEveryMinMs, CONFIG.compactEveryMaxMs);
       }
 
-      if (now >= state.nextSpawnAt && now >= state.compactUntil && state.active.size < CONFIG.maxPrompts) {
+      const difficulty = getDifficulty();
+      if (now >= state.nextSpawnAt && now >= state.compactUntil && state.active.size < difficulty.maxPrompts) {
         spawnApprovalPrompt();
-        state.nextSpawnAt = now + randomBetween(CONFIG.minSpawnMs, CONFIG.maxSpawnMs);
+        state.nextSpawnAt = now + randomBetween(difficulty.minSpawnMs, difficulty.maxSpawnMs);
       }
 
       if (now - state.lastTerminalAt > 2400) {
@@ -1306,6 +1326,18 @@
 
       updateUi(now);
       state.animationFrame = requestAnimationFrame(tick);
+    }
+
+    function advanceProject(now) {
+      const completedLevel = state.level;
+      const timeBonus = Math.ceil(Math.max(0, state.endAt - now) / 1000) * 8;
+      state.score += 500 + timeBonus;
+      state.level += 1;
+      addTerminal("pass", `project ${completedLevel} shipped; advancing to project ${state.level}`);
+      addFeed("level", `Project ${completedLevel} complete`);
+      showToast("good", `Project ${completedLevel} complete. Level ${state.level} begins.`);
+      startProject(now);
+      updateUi(now);
     }
 
     function spawnApprovalPrompt() {
@@ -1320,7 +1352,7 @@
     }
 
     function choosePrompt() {
-      const badChance = state.correct < 6 ? .12 : .24;
+      const badChance = Math.min(.34, (state.correct < 6 ? .12 : .22) + (state.level - 1) * .025);
       const kind = Math.random() < badChance ? "bad" : "good";
       const pool = PROMPT_LIBRARY.filter(item => item.kind === kind);
       return pick(pool);
@@ -1406,6 +1438,7 @@
           showToast("good", "Change approved. +" + 100);
         }
         state.correct += 1;
+        state.totalCorrect += 1;
         addFeed("done", prompt.title);
       } else if (prompt.kind === "bad" && choice === "accept") {
         addTerminal("fail", `dangerous approval accepted: ${prompt.title}`);
@@ -1438,7 +1471,9 @@
       state.active.clear();
       node.remove();
       state.compactUntil = performance.now() + CONFIG.compactDurationMs;
-      state.correct = Math.min(CONFIG.targetCorrect, state.correct + cleared);
+      const gained = Math.min(cleared, CONFIG.targetCorrect - state.correct);
+      state.correct += gained;
+      state.totalCorrect += gained;
       state.score += cleared * 120 + 180;
       addTerminal("pass", `context compacted; resolved ${cleared} active approvals`);
       addFeed("context", `Compacted ${cleared} visible prompts`);
@@ -1449,11 +1484,7 @@
     function finishGame(won, title, message) {
       state.running = false;
       cancelAnimationFrame(state.animationFrame);
-      for (const item of state.active.values()) {
-        item.node.remove();
-      }
-      state.active.clear();
-      document.querySelectorAll(".prompt.compact").forEach(node => node.remove());
+      clearPrompts();
 
       const now = performance.now();
       state.displayRemainingMs = Math.max(0, state.endAt - now);
@@ -1461,11 +1492,11 @@
       els.endTitle.textContent = title;
       els.endBadge.textContent = won ? "Win" : "Game over";
       els.endMessage.textContent = message;
-      els.finalCorrect.textContent = `${state.correct} / ${CONFIG.targetCorrect}`;
+      els.finalLevel.textContent = String(state.level);
+      els.finalCorrect.textContent = `${state.totalCorrect} total`;
       els.finalRisk.textContent = String(state.riskStopped);
-      els.finalTime.textContent = formatTime(Math.max(0, state.endAt - now));
       els.endOverlay.classList.remove("hidden");
-      addTerminal(won ? "pass" : "fail", won ? "ship complete" : "sprint failed");
+      addTerminal(won ? "pass" : "fail", won ? "run complete" : "project failed");
     }
 
     function updateUi(now) {
@@ -1474,19 +1505,39 @@
       const progress = Math.min(100, Math.round((state.correct / CONFIG.targetCorrect) * 100));
       els.timer.textContent = formatTime(remaining);
       els.timer.classList.toggle("danger", state.running && remaining <= 20000);
+      els.progressLabel.textContent = "Project " + state.level + " readiness";
       els.progressText.textContent = progress + "%";
       els.progressFill.style.width = progress + "%";
+      els.levelStat.textContent = String(state.level);
       els.correctStat.textContent = String(state.correct);
       els.riskStat.textContent = String(state.riskStopped);
       els.queueStat.textContent = String(state.active.size);
       els.scoreStatus.textContent = "score " + state.score;
-      els.remainingStatus.textContent = "target " + Math.max(0, CONFIG.targetCorrect - state.correct);
+      els.remainingStatus.textContent = "project " + state.level + " target " + Math.max(0, CONFIG.targetCorrect - state.correct);
 
       if (state.running && now < state.compactUntil) {
         els.compactStatus.textContent = "context: compact " + Math.ceil((state.compactUntil - now) / 1000) + "s";
       } else {
         els.compactStatus.textContent = "context: full";
       }
+    }
+
+    function clearPrompts() {
+      for (const item of state.active.values()) {
+        item.node.remove();
+      }
+      state.active.clear();
+      document.querySelectorAll(".prompt.compact").forEach(node => node.remove());
+    }
+
+    function getDifficulty() {
+      const levelIndex = state.level - 1;
+      return {
+        maxPrompts: Math.min(CONFIG.maxPromptCap, CONFIG.baseMaxPrompts + Math.floor(levelIndex / 2)),
+        firstSpawnMs: Math.max(350, CONFIG.baseFirstSpawnMs - levelIndex * 90),
+        minSpawnMs: Math.max(CONFIG.minSpawnFloorMs, CONFIG.baseMinSpawnMs - levelIndex * 120),
+        maxSpawnMs: Math.max(CONFIG.maxSpawnFloorMs, CONFIG.baseMaxSpawnMs - levelIndex * 180)
+      };
     }
 
     function addFeed(type, text) {
