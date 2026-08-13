@@ -4,7 +4,7 @@ SLOP PARADE is a single-file browser game about managing approval pressure durin
 
 ## Play Locally
 
-Open `codex-approval-rush.html` in any modern browser. No install step, build tool, local server, or internet connection is required.
+Open `slop-parade.html` in any modern browser. No install step, build tool, local server, or internet connection is required.
 
 ## Objective
 
