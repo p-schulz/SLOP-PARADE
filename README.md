@@ -2,6 +2,8 @@
 
 SLOP PARADE is a single-file browser game about managing approval pressure during a fast coding session. The player has two minutes to finish each project by approving useful agent changes, rejecting dangerous requests, and using compact context at the right moments to control the queue.
 
+Test it on [itch.io](https://p-schulz.itch.io/slop-parade)
+
 ## Play Locally
 
 Open `index.html` in any modern browser. The game fills the browser window automatically. No install step, build tool, local server, or internet connection is required.
